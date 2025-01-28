@@ -7,7 +7,6 @@ import (
 
 	"github.com/Bephoros/Chirpy/internal/auth"
 	"github.com/Bephoros/Chirpy/internal/database"
-	"github.com/google/uuid"
 )
 
 func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
@@ -16,12 +15,9 @@ func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 		Password string `json:"password"`
 	}
 	type response struct {
-		ID           uuid.UUID `json:"id"`
-		CreatedAt    time.Time `json:"created_at"`
-		UpdatedAt    time.Time `json:"updated_at"`
-		Email        string    `json:"email"`
-		Token        string    `json:"token"`
-		RefreshToken string    `json:"refresh_token"`
+		User
+		Token        string `json:"token"`
+		RefreshToken string `json:"refresh_token"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -66,10 +62,13 @@ func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondWithJSON(w, http.StatusOK, response{
-		ID:           user.ID,
-		CreatedAt:    user.CreatedAt,
-		UpdatedAt:    user.UpdatedAt,
-		Email:        user.Email,
+		User: User{
+			ID:          user.ID,
+			CreatedAt:   user.CreatedAt,
+			UpdatedAt:   user.UpdatedAt,
+			Email:       user.Email,
+			IsChirpyRed: user.IsChirpyRed,
+		},
 		Token:        token,
 		RefreshToken: refresh,
 	})
